@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctime>
 #include <vector>
 #include <GLFW/glfw3.h>
 #include "Brick.h"
@@ -11,6 +12,15 @@ bool GLOBAL_FINISHGAME = false;
 
 std::vector<Brick> bricks;
 Brick paddle(377, 460, 100, 10, Color(0.655, 0.063, 0.761));
+
+time_t t = time(NULL);
+int count = 0;
+
+int speed = 0;
+
+void cursor_callback(GLFWwindow* window, double xpos, double ypos){
+	speed = (int) ((xpos - SCREENWIDTH/2)*0.05);
+}
 
 void initBrickWall() {
 	int i, j;
@@ -73,13 +83,13 @@ void clearScreen() {
 
 int main() {
 	GLFWwindow* window;
-	
+
 	if (!initGL(&window)) {
 		return -1;
 	}
 
 	initBrickWall();
-
+	glfwSetCursorPosCallback(window, cursor_callback);
 	while (!glfwWindowShouldClose(window) && !GLOBAL_FINISHGAME) {
 		clearScreen();
 
@@ -92,6 +102,16 @@ int main() {
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
+
+		paddle.setXPos(paddle.getXPos()+speed);
+
+		if(t == time(NULL)){
+			count++;
+		}else{
+			t = time(NULL);
+			printf("%d fps\n", count);
+			count = 0;
+		}
 	}
 
 	glfwTerminate();

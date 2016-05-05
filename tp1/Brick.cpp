@@ -24,6 +24,10 @@ int Brick::getWidth() {
 	return width;
 }
 
+void Brick::setXPos(int xPos){
+	this->xPos = xPos;
+}
+
 void Brick::draw() {
 	glColor3f(color.getR(), color.getG(), color.getB());
 

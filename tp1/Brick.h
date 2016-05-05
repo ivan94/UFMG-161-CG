@@ -11,6 +11,7 @@ public:
 	Brick(int x, int y, int w, int h, Color c);
 	int getXPos();
 	int getYPos();
+	void setXPos(int xPos);
 	int getHeight();
 	int getWidth();
 	void draw();
