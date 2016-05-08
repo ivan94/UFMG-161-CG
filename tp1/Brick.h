@@ -5,6 +5,7 @@ class Brick {
 private:
 	int xPos, yPos;
 	int height, width;
+	bool indestructible;
 	Color color;
 
 public:
@@ -14,5 +15,9 @@ public:
 	void setXPos(int xPos);
 	int getHeight();
 	int getWidth();
+	void setColor(Color c);
+	void setIndestructible(bool ind);
+	bool hit();
+	void printState(int i);
 	void draw();
 };

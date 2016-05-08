@@ -1,26 +1,29 @@
 #include <stdio.h>
-#include <ctime>
 #include <vector>
 #include <GLFW/glfw3.h>
 #include "Brick.h"
 #include "Color.h"
+#include "Paddle.h"
+#include "Ball.h"
+#include "SpeedBar.h"
+#include "PowerBar.h"
 
 #define SCREENWIDTH 854
 #define SCREENHEIGHT 480
 
 bool GLOBAL_FINISHGAME = false;
+bool GLOBAL_GAMEPAUSED = true;
+bool GLOBAL_SETGAMETOPAUSE = false;
 
 std::vector<Brick> bricks;
-Brick paddle(377, 460, 100, 10, Color(0.655, 0.063, 0.761));
+Paddle paddle(377, 460, 100, 10, 0, SCREENWIDTH, Color(0.655f, 0.063f, 0.761f));
+Ball ball(422, 450, 10, SCREENWIDTH, SCREENHEIGHT, Color::white());
+SpeedBar speedbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
+PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
 
-time_t t = time(NULL);
-int count = 0;
-
-int speed = 0;
-
-void cursor_callback(GLFWwindow* window, double xpos, double ypos){
-	speed = (int) ((xpos - SCREENWIDTH/2)*0.05);
-}
+double gameTime;
+int windowWidth = SCREENWIDTH;
+int windowHeight = SCREENHEIGHT;
 
 void initBrickWall() {
 	int i, j;
@@ -30,6 +33,10 @@ void initBrickWall() {
 	int gapY = 6;
 	int brickX, brickY;
 
+	if (!bricks.empty()) {
+		bricks.clear();
+	}
+
 	for (i = 0; i < 5; i++) {
 		brickY = gapY + i * (gapY + brickHeight);
 		for (j = 0; j < 15; j++) {
@@ -37,10 +44,78 @@ void initBrickWall() {
 			bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, Color::blue()));
 		}
 	}
+
+	//Some indestructible bricks
+	bricks[4 * 15 + 7].setIndestructible(true);
+	bricks[4 * 15 + 7].setColor(Color(0.5f, 0.5f, 0.5f));
+	bricks[2 * 15 + 5].setIndestructible(true);
+	bricks[2 * 15 + 5].setColor(Color(0.5f, 0.5f, 0.5f));
+	bricks[2 * 15 + 9].setIndestructible(true);
+	bricks[2 * 15 + 9].setColor(Color(0.5f, 0.5f, 0.5f));
+	bricks[4 * 15 + 3].setIndestructible(true);
+	bricks[4 * 15 + 3].setColor(Color(0.5f, 0.5f, 0.5f));
+	bricks[4 * 15 + 11].setIndestructible(true);
+	bricks[4 * 15 + 11].setColor(Color(0.5f, 0.5f, 0.5f));
+
+}
+
+void restartGame() {
+	GLOBAL_GAMEPAUSED = true;
+	initBrickWall();
+	paddle.setSpeed(0);
+	paddle.setXPos(377);
+	ball.setXPos(422);
+	ball.setYPos(450);
+	ball.setMinSpeed(1.42f);
+	ball.setMaxSpeed(7.25f);
+	ball.setSpeed(0.5f);
+}
+
+void printGameState() {
+	int i = 0;
+
+	for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
+		(*it).printState(i);
+		i++;
+	}
+	printf("\n");
+	paddle.printState();
+	ball.printState();
+}
+
+void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) {
+	switch (button) {
+	case GLFW_MOUSE_BUTTON_LEFT:
+		if (action == GLFW_PRESS) {
+			GLOBAL_GAMEPAUSED = !GLOBAL_GAMEPAUSED;
+		}
+		break;
+	case GLFW_MOUSE_BUTTON_RIGHT:
+		if (action == GLFW_PRESS) {
+			if (!GLOBAL_GAMEPAUSED) {
+				GLOBAL_GAMEPAUSED = true;
+				printGameState();
+			}
+			else {
+				GLOBAL_SETGAMETOPAUSE = true;
+				GLOBAL_GAMEPAUSED = false;
+			}
+		}
+		break;
+	}
+}
+
+void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
+	int midScreen = windowWidth / 2;
+	paddle.setSpeed((int)(((xpos - midScreen) / midScreen) * paddle.getMaxSpeed()));
+	speedbar.setXPos((int)((xpos / windowWidth) * SCREENWIDTH));
+	powerbar.setYPos((int)((ypos / windowHeight) * SCREENHEIGHT));
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
+	windowWidth = width;
+	windowHeight = height;
 }
 
 void character_callback(GLFWwindow *window, unsigned int codepoint) {
@@ -48,6 +123,10 @@ void character_callback(GLFWwindow *window, unsigned int codepoint) {
 	case 'q':
 	case 'Q':
 		GLOBAL_FINISHGAME = true;
+		break;
+	case 'r':
+	case 'R':
+		restartGame();
 		break;
 	}
 }
@@ -72,6 +151,9 @@ bool initGL(GLFWwindow** window) {
 
 	glfwSetFramebufferSizeCallback(*window, framebuffer_size_callback);
 	glfwSetCharCallback(*window, character_callback);
+	glfwSetCursorPosCallback(*window, cursor_callback);
+	glfwSetMouseButtonCallback(*window, mousebutton_callback);
+	glfwSwapInterval(1);
 
 	return true;
 }
@@ -82,35 +164,73 @@ void clearScreen() {
 }
 
 int main() {
+	double timeElapsed;
+	int fpsCounter = 0;
 	GLFWwindow* window;
-
+	
 	if (!initGL(&window)) {
 		return -1;
 	}
 
-	initBrickWall();
-	glfwSetCursorPosCallback(window, cursor_callback);
+	restartGame();
+	gameTime = glfwGetTime();
+
 	while (!glfwWindowShouldClose(window) && !GLOBAL_FINISHGAME) {
 		clearScreen();
+
+		glfwPollEvents();
+
+		if (!GLOBAL_GAMEPAUSED) {
+			paddle.update();
+			ball.update();
+			if (ball.collisionDetection(paddle)) {
+				ball.setSpeed(1.0f - ((float)powerbar.getYPos() / (float)SCREENHEIGHT));
+			}
+			for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
+				if (ball.collisionDetection(*it)) {
+					if ((*it).hit()) {
+						it = bricks.erase(it);
+					}
+					break;
+				}
+			}
+		}
 
 		for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
 			(*it).draw();
 		}
 
 		paddle.draw();
+		ball.draw();
+		speedbar.draw();
+		powerbar.draw();
 
 		glfwSwapBuffers(window);
 
-		glfwPollEvents();
-
-		paddle.setXPos(paddle.getXPos()+speed);
-
-		if(t == time(NULL)){
-			count++;
-		}else{
-			t = time(NULL);
-			printf("%d fps\n", count);
-			count = 0;
+		//Framerate control
+		timeElapsed = glfwGetTime() - gameTime;
+		if (timeElapsed < 1) {
+			fpsCounter++;
+		}
+		else {
+			printf("%d fps\n", fpsCounter);
+			fpsCounter = 0;
+			gameTime = glfwGetTime();
+		}
+		
+		//Used for successive right mouse clicks
+		if (GLOBAL_SETGAMETOPAUSE) {
+			GLOBAL_SETGAMETOPAUSE = false;
+			GLOBAL_GAMEPAUSED = true;
+			printGameState();
+		}
+		//Loop for paused game
+		while (GLOBAL_GAMEPAUSED) {
+			//Game is unpaused when the left mouse button is pressed
+			glfwWaitEvents();
+			if (glfwWindowShouldClose(window) || GLOBAL_FINISHGAME) {
+				break;
+			}
 		}
 	}
 
