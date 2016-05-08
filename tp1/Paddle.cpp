@@ -1,5 +1,6 @@
 #include <GLFW/glfw3.h>
 #include "Paddle.h"
+#include <stdio.h>
 
 Paddle::Paddle(int x, int y, int w, int h, int minX, int maxX, Color c) :
 	xPos(x),
@@ -46,6 +47,10 @@ void Paddle::setSpeed(int speed) {
 
 int Paddle::getMaxSpeed() {
 	return maxSpeed;
+}
+
+void Paddle::printState() {
+	printf("Paddle:\nX Pos: %d\nY Pos: %d\nSpeed: %d\n\n", xPos, yPos, xSpeed);
 }
 
 void Paddle::update() {

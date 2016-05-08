@@ -1,5 +1,6 @@
 #include <GLFW/glfw3.h>
 #include "Ball.h"
+#include <stdio.h>
 
 #define SQRT2 1.4142f
 
@@ -131,6 +132,10 @@ bool Ball::collisionDetection(Brick &b) {
 	}
 
 	return false;
+}
+
+void Ball::printState() {
+	printf("Ball:\nX Pos: %d\nY Pos: %d\nSpeed: %.2f\nX Speed: %d\nY Speed: %d\n\n", xPos, yPos, speed, xSpeed, ySpeed);
 }
 
 void Ball::update() {

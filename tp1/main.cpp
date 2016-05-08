@@ -67,7 +67,7 @@ void restartGame() {
 	ball.setXPos(422);
 	ball.setYPos(450);
 	ball.setMinSpeed(1.42f);
-	ball.setMaxSpeed(7.15f);
+	ball.setMaxSpeed(7.25f);
 	ball.setSpeed(0.5f);
 }
 
@@ -75,12 +75,12 @@ void printGameState() {
 	int i = 0;
 
 	for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
-		printf("Brick %d: X Pos: %d Y Pos: %d\n", i, (*it).getXPos(), (*it).getYPos());
+		(*it).printState(i);
 		i++;
 	}
 	printf("\n");
-	printf("Paddle:\nX Pos: %d\nY Pos: %d\nSpeed: %d\n\n", paddle.getXPos(), paddle.getYPos(), paddle.getSpeed());
-	printf("Ball:\nX Pos: %d\nY Pos: %d\nSpeed: %.2f\nX Speed: %d\nY Speed: %d\n\n", ball.getXPos(), ball.getYPos(), ball.getSpeed(), ball.getXSpeed(), ball.getYSpeed());
+	paddle.printState();
+	ball.printState();
 }
 
 void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) {

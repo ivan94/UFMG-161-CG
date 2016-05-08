@@ -20,6 +20,7 @@ public:
 	int getMaxSpeed();
 	int getHeight();
 	int getWidth();
+	void printState();
 	void update();
 	void draw();
 };

@@ -1,5 +1,6 @@
 #include <GLFW/glfw3.h>
 #include "Brick.h"
+#include <stdio.h>
 
 Brick::Brick(int x, int y, int w, int h, Color c) :
 	xPos(x),
@@ -39,6 +40,14 @@ void Brick::setIndestructible(bool ind) {
 
 bool Brick::hit() {
 	return !indestructible;
+}
+
+void Brick::printState(int i) {
+	printf("Brick %d: X Pos: %d Y Pos: %d", i, xPos, yPos);
+	if (indestructible) {
+		printf(" (Indestructible)");
+	}
+	printf("\n");
 }
 
 void Brick::draw() {

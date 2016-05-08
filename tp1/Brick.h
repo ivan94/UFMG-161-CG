@@ -18,5 +18,6 @@ public:
 	void setColor(Color c);
 	void setIndestructible(bool ind);
 	bool hit();
+	void printState(int i);
 	void draw();
 };

@@ -27,6 +27,7 @@ public:
 	int getSize();
 	bool collisionDetection(Paddle &p);
 	bool collisionDetection(Brick &b);
+	void printState();
 	void update();
 	void draw();
 };
