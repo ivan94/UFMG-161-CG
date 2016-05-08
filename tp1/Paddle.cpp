@@ -5,11 +5,11 @@
 Paddle::Paddle(int x, int y, int w, int h, int minX, int maxX, Color c) :
 	xPos(x),
 	yPos(y),
+	xSpeed(0),
 	height(h),
 	width(w),
 	minXLimit(minX),
 	maxXLimit(maxX),
-	xSpeed(0),
 	maxSpeed(21),
 	color(c) {}
 

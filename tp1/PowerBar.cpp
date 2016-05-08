@@ -2,9 +2,9 @@
 #include "PowerBar.h"
 
 PowerBar::PowerBar(int x, int width, int screenHeight, Color c) :
+	screenHeight(screenHeight),
 	xPos(x),
 	yPos(screenHeight),
-	screenHeight(screenHeight),
 	width(width),
 	color(c) {}
 

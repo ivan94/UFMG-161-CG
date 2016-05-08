@@ -7,11 +7,11 @@
 Ball::Ball(int x, int y, int size, int screenW, int screenH, Color c) :
 	xPos(x),
 	yPos(y),
-	size(size),
-	screenHeight(screenH),
-	screenWidth(screenW),
 	xSpeed(1),
 	ySpeed(1),
+	screenWidth(screenW),
+	screenHeight(screenH),
+	size(size),
 	color(c) {}
 
 int Ball::getXPos() {
@@ -50,7 +50,7 @@ void Ball::setSpeed(float speed) {
 	else {
 		xSpeed = (int)(speed / SQRT2 * -1);
 	}
-	
+
 	if (ySpeed > 0) {
 		ySpeed = (int)(speed / SQRT2);
 	}
@@ -88,7 +88,7 @@ bool Ball::collisionDetection(Paddle &p) {
 		xPos + size > p.getXPos() &&
 		yPos < p.getYPos() + p.getHeight() &&
 		yPos + size > p.getYPos()) {
-		
+
 		//If the ball is higher than the paddle (or was higher in the last frame), the ball must be reflected
 		if (yPos + size - ySpeed <= p.getYPos()) {
 			ySpeed *= -1;

@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <vector>
+#include <cstring>
 #include <GLFW/glfw3.h>
+#include <GL/glut.h>
 #include "Brick.h"
 #include "Color.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "SpeedBar.h"
 #include "PowerBar.h"
+#include "Text2D.h"
+#include "Text.h"
 
 #define SCREENWIDTH 854
 #define SCREENHEIGHT 480
@@ -17,6 +21,7 @@ bool GLOBAL_SETGAMETOPAUSE = false;
 
 std::vector<Brick> bricks;
 Paddle paddle(377, 460, 100, 10, 0, SCREENWIDTH, Color(0.655f, 0.063f, 0.761f));
+Text score(4, 4, "Score: %d", Color(1, 1, 1));
 Ball ball(422, 450, 10, SCREENWIDTH, SCREENHEIGHT, Color::white());
 SpeedBar speedbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
 PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
@@ -24,6 +29,9 @@ PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
 double gameTime;
 int windowWidth = SCREENWIDTH;
 int windowHeight = SCREENHEIGHT;
+
+int fps;
+int pts = 0;
 
 void initBrickWall() {
 	int i, j;
@@ -163,11 +171,13 @@ void clearScreen() {
 	glClearColor(0, 0, 0, 0);
 }
 
-int main() {
+int main(int argc, const char* argv[]) {
 	double timeElapsed;
 	int fpsCounter = 0;
 	GLFWwindow* window;
-	
+
+	glutInit(&argc, (char **)argv);
+
 	if (!initGL(&window)) {
 		return -1;
 	}
@@ -189,6 +199,8 @@ int main() {
 			for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
 				if (ball.collisionDetection(*it)) {
 					if ((*it).hit()) {
+						pts++;
+						score.setValue(pts);
 						it = bricks.erase(it);
 					}
 					break;
@@ -204,25 +216,25 @@ int main() {
 		ball.draw();
 		speedbar.draw();
 		powerbar.draw();
+		score.draw();
 
 		glfwSwapBuffers(window);
 
+		//Used for successive right mouse clicks
+		if (GLOBAL_SETGAMETOPAUSE) {
+			GLOBAL_SETGAMETOPAUSE = false;
+			GLOBAL_GAMEPAUSED = true;
+			printGameState();
+		}
 		//Framerate control
 		timeElapsed = glfwGetTime() - gameTime;
 		if (timeElapsed < 1) {
 			fpsCounter++;
 		}
 		else {
-			printf("%d fps\n", fpsCounter);
+			fps = fpsCounter;
 			fpsCounter = 0;
 			gameTime = glfwGetTime();
-		}
-		
-		//Used for successive right mouse clicks
-		if (GLOBAL_SETGAMETOPAUSE) {
-			GLOBAL_SETGAMETOPAUSE = false;
-			GLOBAL_GAMEPAUSED = true;
-			printGameState();
 		}
 		//Loop for paused game
 		while (GLOBAL_GAMEPAUSED) {

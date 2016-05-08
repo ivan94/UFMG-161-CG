@@ -2,10 +2,10 @@
 #include "SpeedBar.h"
 
 SpeedBar::SpeedBar(int y, int height, int screenWidth, Color c) :
-	yPos(y),
-	height(height),
 	screenWidth(screenWidth),
 	xPos(screenWidth / 2),
+	yPos(y),
+	height(height),
 	color(c) {}
 
 void SpeedBar::setXPos(int x) {
