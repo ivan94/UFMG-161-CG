@@ -3,12 +3,13 @@
 
 class PowerBar {
 private:
-	int screenWidth;
-	int xPos, yPos, height;
+	int screenHeight;
+	int xPos, yPos, width;
 	Color color;
 
 public:
-	PowerBar(int y, int height, int screenWidth, Color c);
-	void setXPos(int x);
+	PowerBar(int x, int width, int screenHeight, Color c);
+	void setYPos(int y);
+	int getYPos();
 	void draw();
 };

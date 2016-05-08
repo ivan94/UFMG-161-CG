@@ -9,6 +9,7 @@ Paddle::Paddle(int x, int y, int w, int h, int minX, int maxX, Color c) :
 	minXLimit(minX),
 	maxXLimit(maxX),
 	xSpeed(0),
+	maxSpeed(21),
 	color(c) {}
 
 int Paddle::getXPos() {
@@ -41,6 +42,10 @@ void Paddle::setYPos(int pos) {
 
 void Paddle::setSpeed(int speed) {
 	xSpeed = speed;
+}
+
+int Paddle::getMaxSpeed() {
+	return maxSpeed;
 }
 
 void Paddle::update() {

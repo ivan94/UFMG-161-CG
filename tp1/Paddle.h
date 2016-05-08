@@ -6,6 +6,7 @@ private:
 	int xPos, yPos, xSpeed;
 	int height, width;
 	int minXLimit, maxXLimit;
+	int maxSpeed;
 	Color color;
 
 public:
@@ -16,6 +17,7 @@ public:
 	void setXPos(int pos);
 	void setYPos(int pos);
 	void setSpeed(int speed);
+	int getMaxSpeed();
 	int getHeight();
 	int getWidth();
 	void update();

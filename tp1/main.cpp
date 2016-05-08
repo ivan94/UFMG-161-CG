@@ -5,6 +5,7 @@
 #include "Color.h"
 #include "Paddle.h"
 #include "Ball.h"
+#include "SpeedBar.h"
 #include "PowerBar.h"
 
 #define SCREENWIDTH 854
@@ -17,7 +18,8 @@ bool GLOBAL_SETGAMETOPAUSE = false;
 std::vector<Brick> bricks;
 Paddle paddle(377, 460, 100, 10, 0, SCREENWIDTH, Color(0.655f, 0.063f, 0.761f));
 Ball ball(422, 450, 10, SCREENWIDTH, SCREENHEIGHT, Color::white());
-PowerBar powerbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
+SpeedBar speedbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
+PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
 
 double gameTime;
 int windowWidth = SCREENWIDTH;
@@ -64,8 +66,9 @@ void restartGame() {
 	paddle.setXPos(377);
 	ball.setXPos(422);
 	ball.setYPos(450);
-	ball.setXSpeed(3);
-	ball.setYSpeed(-3);
+	ball.setMinSpeed(1.42f);
+	ball.setMaxSpeed(7.15f);
+	ball.setSpeed(0.5f);
 }
 
 void printGameState() {
@@ -77,7 +80,7 @@ void printGameState() {
 	}
 	printf("\n");
 	printf("Paddle:\nX Pos: %d\nY Pos: %d\nSpeed: %d\n\n", paddle.getXPos(), paddle.getYPos(), paddle.getSpeed());
-	printf("Ball:\nX Pos: %d\nY Pos: %d\n\n", ball.getXPos(), ball.getYPos());
+	printf("Ball:\nX Pos: %d\nY Pos: %d\nSpeed: %.2f\nX Speed: %d\nY Speed: %d\n\n", ball.getXPos(), ball.getYPos(), ball.getSpeed(), ball.getXSpeed(), ball.getYSpeed());
 }
 
 void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) {
@@ -103,8 +106,10 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) 
 }
 
 void cursor_callback(GLFWwindow* window, double xpos, double ypos) {
-	paddle.setSpeed((int)((xpos - windowWidth / 2)*0.05));
-	powerbar.setXPos((int)((xpos / windowWidth)*SCREENWIDTH));
+	int midScreen = windowWidth / 2;
+	paddle.setSpeed((int)(((xpos - midScreen) / midScreen) * paddle.getMaxSpeed()));
+	speedbar.setXPos((int)((xpos / windowWidth) * SCREENWIDTH));
+	powerbar.setYPos((int)((ypos / windowHeight) * SCREENHEIGHT));
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
@@ -178,7 +183,9 @@ int main() {
 		if (!GLOBAL_GAMEPAUSED) {
 			paddle.update();
 			ball.update();
-			ball.collisionDetection(paddle);
+			if (ball.collisionDetection(paddle)) {
+				ball.setSpeed(1.0f - ((float)powerbar.getYPos() / (float)SCREENHEIGHT));
+			}
 			for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
 				if (ball.collisionDetection(*it)) {
 					if ((*it).hit()) {
@@ -195,6 +202,7 @@ int main() {
 
 		paddle.draw();
 		ball.draw();
+		speedbar.draw();
 		powerbar.draw();
 
 		glfwSwapBuffers(window);
@@ -210,6 +218,7 @@ int main() {
 			gameTime = glfwGetTime();
 		}
 		
+		//Used for successive right mouse clicks
 		if (GLOBAL_SETGAMETOPAUSE) {
 			GLOBAL_SETGAMETOPAUSE = false;
 			GLOBAL_GAMEPAUSED = true;

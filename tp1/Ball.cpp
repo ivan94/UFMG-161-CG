@@ -1,12 +1,16 @@
 #include <GLFW/glfw3.h>
 #include "Ball.h"
-#include <stdio.h>
+
+#define SQRT2 1.4142f
+
 Ball::Ball(int x, int y, int size, int screenW, int screenH, Color c) :
 	xPos(x),
 	yPos(y),
 	size(size),
 	screenHeight(screenH),
 	screenWidth(screenW),
+	xSpeed(1),
+	ySpeed(1),
 	color(c) {}
 
 int Ball::getXPos() {
@@ -25,12 +29,53 @@ void Ball::setYPos(int yPos) {
 	this->yPos = yPos;
 }
 
-void Ball::setXSpeed(int speed) {
-	xSpeed = speed;
+//Receives a float from 0.0 to 1.0 that will be converted from minSpeed to maxSpeed
+void Ball::setSpeed(float speed) {
+	if (speed < 0.0f) {
+		speed = 0.0f;
+	}
+	else if (speed > 1.0f) {
+		speed = 1.0f;
+	}
+
+	speed *= (maxSpeed - minSpeed);
+	speed += minSpeed;
+
+	this->speed = speed;
+
+	if (xSpeed > 0) {
+		xSpeed = (int)(speed / SQRT2);
+	}
+	else {
+		xSpeed = (int)(speed / SQRT2 * -1);
+	}
+	
+	if (ySpeed > 0) {
+		ySpeed = (int)(speed / SQRT2);
+	}
+	else {
+		ySpeed = (int)(speed / SQRT2 * -1);
+	}
 }
 
-void Ball::setYSpeed(int speed) {
-	ySpeed = speed;
+void Ball::setMinSpeed(float speed) {
+	this->minSpeed = speed;
+}
+
+void Ball::setMaxSpeed(float speed) {
+	this->maxSpeed = speed;
+}
+
+float Ball::getSpeed() {
+	return speed;
+}
+
+int Ball::getXSpeed() {
+	return xSpeed;
+}
+
+int Ball::getYSpeed() {
+	return ySpeed;
 }
 
 int Ball::getSize() {
