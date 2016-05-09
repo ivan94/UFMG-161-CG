@@ -28,6 +28,8 @@ SpeedBar speedbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
 PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
 
 sf::Music bgm;
+sf::Sound hitSound;
+sf::Sound kickSound;
 
 double gameTime;
 int windowWidth = SCREENWIDTH;
@@ -80,6 +82,8 @@ void restartGame() {
 	ball.setMinSpeed(1.42f);
 	ball.setMaxSpeed(7.25f);
 	ball.setSpeed(0.5f);
+	bgm.stop();
+	bgm.setVolume(20);
 }
 
 void printGameState() {
@@ -99,6 +103,11 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) 
 	case GLFW_MOUSE_BUTTON_LEFT:
 		if (action == GLFW_PRESS) {
 			GLOBAL_GAMEPAUSED = !GLOBAL_GAMEPAUSED;
+			if(GLOBAL_GAMEPAUSED){
+				bgm.pause();
+			}else{
+				bgm.play();
+			}
 		}
 		break;
 	case GLFW_MOUSE_BUTTON_RIGHT:
@@ -142,6 +151,7 @@ void character_callback(GLFWwindow *window, unsigned int codepoint) {
 	}
 }
 
+
 bool initGL(GLFWwindow** window) {
 	if (!glfwInit()) {
 		return false;
@@ -179,11 +189,23 @@ int main(int argc, const char* argv[]) {
 	int fpsCounter = 0;
 	GLFWwindow* window;
 
+	/*INIT SOUNDS*/
 	if(!bgm.openFromFile("media/htt.ogg")){
-		return -1;
+		return false;
 	}
 
-	bgm.play();
+	sf::SoundBuffer bufferHit, bufferKick;
+
+	if(!bufferHit.loadFromFile("media/snare.ogg")){
+		return false;
+	}
+
+	if(!bufferKick.loadFromFile("media/kick.ogg")){
+		return false;
+	}
+
+	kickSound.setBuffer(bufferKick);
+	hitSound.setBuffer(bufferHit);
 
 	glutInit(&argc, (char **)argv);
 
@@ -204,6 +226,7 @@ int main(int argc, const char* argv[]) {
 			ball.update();
 			if (ball.collisionDetection(paddle)) {
 				ball.setSpeed(1.0f - ((float)powerbar.getYPos() / (float)SCREENHEIGHT));
+				kickSound.play();
 			}
 			for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
 				if (ball.collisionDetection(*it)) {
@@ -211,6 +234,7 @@ int main(int argc, const char* argv[]) {
 						pts++;
 						score.setValue(pts);
 						it = bricks.erase(it);
+						hitSound.play();
 					}
 					break;
 				}

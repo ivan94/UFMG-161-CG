@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-c -Wall
-LFLAGS=-lGL -lGLU -lglut -lglfw3 -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor -lsfml-audio
+LFLAGS=-lGL -lGLU -lglut -lglfw3 -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor -lsfml-audio -lsfml-system
 OBJS=Brick.o Color.o Paddle.o PowerBar.o SpeedBar.o Ball.o Text2D.o Text.o
 %.o: %.cpp
 	@echo 'Building $<'
