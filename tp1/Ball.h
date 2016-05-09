@@ -28,6 +28,6 @@ public:
 	bool collisionDetection(Paddle &p);
 	bool collisionDetection(Brick &b);
 	void printState();
-	void update();
+	bool update();
 	void draw();
 };

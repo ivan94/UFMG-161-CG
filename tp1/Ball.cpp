@@ -138,7 +138,7 @@ void Ball::printState() {
 	printf("Ball:\nX Pos: %d\nY Pos: %d\nSpeed: %.2f\nX Speed: %d\nY Speed: %d\n\n", xPos, yPos, speed, xSpeed, ySpeed);
 }
 
-void Ball::update() {
+bool Ball::update() {
 	xPos += xSpeed;
 	yPos += ySpeed;
 	if (xPos < 0) {
@@ -154,9 +154,10 @@ void Ball::update() {
 		ySpeed *= -1;
 	}
 	else if (yPos + size > screenHeight) {
-		yPos = screenHeight - size;
-		ySpeed *= -1;
+		return true;
 	}
+
+	return false;
 }
 
 void Ball::draw() {

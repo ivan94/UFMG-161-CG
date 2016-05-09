@@ -7,6 +7,7 @@ Brick::Brick(int x, int y, int w, int h, Color c) :
 	yPos(y),
 	height(h),
 	width(w),
+	lives(1),
 	indestructible(false),
 	color(c) {}
 
@@ -30,6 +31,10 @@ void Brick::setXPos(int xPos) {
 	this->xPos = xPos;
 }
 
+void Brick::setLives(int lives) {
+	this->lives = lives;
+}
+
 void Brick::setColor(Color c) {
 	color = c;
 }
@@ -39,7 +44,24 @@ void Brick::setIndestructible(bool ind) {
 }
 
 bool Brick::hit() {
-	return !indestructible;
+	if (indestructible) {
+		return false;
+	}
+	if (lives <= 1) {
+		return true;
+	}
+	else {
+		lives--;
+		switch (lives){
+		case 2:
+			color = Color(.0f, .5f, 1.0f);
+			break;
+		case 1:
+			color = Color(.5f, 1.0f, 1.0f);
+			break;
+		}
+	}
+	return false;
 }
 
 void Brick::printState(int i) {

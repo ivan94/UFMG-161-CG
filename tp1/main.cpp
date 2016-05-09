@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <vector>
 #include <cstring>
+#include <cstdlib>
+#include <ctime>
 #include <GLFW/glfw3.h>
 #include <GL/glut.h>
 #include <SFML/Audio.hpp>
@@ -23,6 +25,8 @@ bool GLOBAL_SETGAMETOPAUSE = false;
 std::vector<Brick> bricks;
 Paddle paddle(377, 460, 100, 10, 0, SCREENWIDTH, Color(0.655f, 0.063f, 0.761f));
 Text score(4, 4, (char*)"Score: %d", Color(1, 1, 1));
+Text lives(100, 4, (char*)"Lives: %d", Color(1, 1, 1));
+Text gameOver(370, 240, (char*)"GAME OVER", Color(1, 1, 1));
 Ball ball(422, 450, 10, SCREENWIDTH, SCREENHEIGHT, Color::white());
 SpeedBar speedbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
 PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
@@ -37,6 +41,8 @@ int windowHeight = SCREENHEIGHT;
 
 int fps;
 int pts = 0;
+int lvs = 3;
+int numBricks = 0;
 
 void initBrickWall() {
 	int i, j;
@@ -45,45 +51,70 @@ void initBrickWall() {
 	int gapX = 6;
 	int gapY = 6;
 	int brickX, brickY;
+	int randNum;
 
 	if (!bricks.empty()) {
 		bricks.clear();
 	}
 
+	numBricks = 0;
 	for (i = 0; i < 5; i++) {
 		brickY = gapY + i * (gapY + brickHeight);
 		for (j = 0; j < 15; j++) {
 			brickX = gapX + j * (gapX + brickWidth);
-			bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, Color::blue()));
+			bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, Color(0.5f, 1.0f, 1.0f)));
+			numBricks++;
+			randNum = rand() % 100;
+			if (randNum < 30) {
+				(*(bricks.end() - 1)).setLives(2);
+				(*(bricks.end() - 1)).setColor(Color(.0f, .5f, 1.0f));
+			}
+			else if (randNum < 50) {
+				(*(bricks.end() - 1)).setLives(3);
+				(*(bricks.end() - 1)).setColor(Color::blue());
+			}
 		}
 	}
 
 	//Some indestructible bricks
 	bricks[4 * 15 + 7].setIndestructible(true);
 	bricks[4 * 15 + 7].setColor(Color(0.5f, 0.5f, 0.5f));
+	numBricks--;
 	bricks[2 * 15 + 5].setIndestructible(true);
 	bricks[2 * 15 + 5].setColor(Color(0.5f, 0.5f, 0.5f));
+	numBricks--;
 	bricks[2 * 15 + 9].setIndestructible(true);
 	bricks[2 * 15 + 9].setColor(Color(0.5f, 0.5f, 0.5f));
+	numBricks--;
 	bricks[4 * 15 + 3].setIndestructible(true);
 	bricks[4 * 15 + 3].setColor(Color(0.5f, 0.5f, 0.5f));
+	numBricks--;
 	bricks[4 * 15 + 11].setIndestructible(true);
 	bricks[4 * 15 + 11].setColor(Color(0.5f, 0.5f, 0.5f));
+	numBricks--;
 
 }
 
-void restartGame() {
+void restartGame(bool restartScore, bool restartBricks) {
 	GLOBAL_GAMEPAUSED = true;
-	initBrickWall();
+	if (restartBricks) {
+		initBrickWall();
+	}
 	paddle.setSpeed(0);
 	paddle.setXPos(377);
 	ball.setXPos(422);
 	ball.setYPos(450);
-	ball.setMinSpeed(1.42f);
+	ball.setMinSpeed(2.85f);
 	ball.setMaxSpeed(7.25f);
 	ball.setSpeed(0.5f);
 	bgm.stop();
 	bgm.setVolume(20);
+	if (restartScore) {
+		pts = 0;
+		lvs = 3;
+		score.setValue(pts);
+		lives.setValue(lvs);
+	}
 }
 
 void printGameState() {
@@ -96,13 +127,16 @@ void printGameState() {
 	printf("\n");
 	paddle.printState();
 	ball.printState();
+	printf("Player:\nLives: %d\nScore %d\n\n", lvs, pts);
 }
 
 void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) {
 	switch (button) {
 	case GLFW_MOUSE_BUTTON_LEFT:
 		if (action == GLFW_PRESS) {
-			GLOBAL_GAMEPAUSED = !GLOBAL_GAMEPAUSED;
+			if (lvs > 0) {
+				GLOBAL_GAMEPAUSED = !GLOBAL_GAMEPAUSED;
+			}
 			if(GLOBAL_GAMEPAUSED){
 				bgm.pause();
 			}else{
@@ -112,13 +146,15 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) 
 		break;
 	case GLFW_MOUSE_BUTTON_RIGHT:
 		if (action == GLFW_PRESS) {
-			if (!GLOBAL_GAMEPAUSED) {
-				GLOBAL_GAMEPAUSED = true;
-				printGameState();
-			}
-			else {
-				GLOBAL_SETGAMETOPAUSE = true;
-				GLOBAL_GAMEPAUSED = false;
+			if (lvs > 0) {
+				if (!GLOBAL_GAMEPAUSED) {
+					GLOBAL_GAMEPAUSED = true;
+					printGameState();
+				}
+				else {
+					GLOBAL_SETGAMETOPAUSE = true;
+					GLOBAL_GAMEPAUSED = false;
+				}
 			}
 		}
 		break;
@@ -146,7 +182,7 @@ void character_callback(GLFWwindow *window, unsigned int codepoint) {
 		break;
 	case 'r':
 	case 'R':
-		restartGame();
+		restartGame(true, true);
 		break;
 	}
 }
@@ -190,7 +226,7 @@ int main(int argc, const char* argv[]) {
 	GLFWwindow* window;
 
 	/*INIT SOUNDS*/
-	if(!bgm.openFromFile("media/htt.ogg")){
+	/*if(!bgm.openFromFile("media/htt.ogg")){
 		return false;
 	}
 
@@ -205,7 +241,7 @@ int main(int argc, const char* argv[]) {
 	}
 
 	kickSound.setBuffer(bufferKick);
-	hitSound.setBuffer(bufferHit);
+	hitSound.setBuffer(bufferHit);*/
 
 	glutInit(&argc, (char **)argv);
 
@@ -213,7 +249,9 @@ int main(int argc, const char* argv[]) {
 		return -1;
 	}
 
-	restartGame();
+	srand(time(NULL));
+
+	restartGame(true, true);
 	gameTime = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window) && !GLOBAL_FINISHGAME) {
@@ -223,10 +261,17 @@ int main(int argc, const char* argv[]) {
 
 		if (!GLOBAL_GAMEPAUSED) {
 			paddle.update();
-			ball.update();
+			if (ball.update()) {
+				lvs--;
+				lives.setValue(lvs);
+				GLOBAL_GAMEPAUSED = true;
+				if (lvs > 0) {
+					restartGame(false, false);
+				}
+			}
 			if (ball.collisionDetection(paddle)) {
 				ball.setSpeed(1.0f - ((float)powerbar.getYPos() / (float)SCREENHEIGHT));
-				kickSound.play();
+				//kickSound.play();
 			}
 			for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
 				if (ball.collisionDetection(*it)) {
@@ -234,7 +279,11 @@ int main(int argc, const char* argv[]) {
 						pts++;
 						score.setValue(pts);
 						it = bricks.erase(it);
-						hitSound.play();
+						numBricks--;
+						if (numBricks <= 0) {
+							restartGame(false, true);
+						}
+						//hitSound.play();
 					}
 					break;
 				}
@@ -250,6 +299,11 @@ int main(int argc, const char* argv[]) {
 		speedbar.draw();
 		powerbar.draw();
 		score.draw();
+		lives.draw();
+
+		if (lvs <= 0) {
+			gameOver.draw();
+		}
 
 		glfwSwapBuffers(window);
 
@@ -268,14 +322,6 @@ int main(int argc, const char* argv[]) {
 			fps = fpsCounter;
 			fpsCounter = 0;
 			gameTime = glfwGetTime();
-		}
-		//Loop for paused game
-		while (GLOBAL_GAMEPAUSED) {
-			//Game is unpaused when the left mouse button is pressed
-			glfwWaitEvents();
-			if (glfwWindowShouldClose(window) || GLOBAL_FINISHGAME) {
-				break;
-			}
 		}
 	}
 
