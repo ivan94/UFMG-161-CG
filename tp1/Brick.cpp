@@ -2,12 +2,13 @@
 #include "Brick.h"
 #include <stdio.h>
 
-Brick::Brick(int x, int y, int w, int h, Color c) :
+Brick::Brick(int x, int y, int w, int h, int type, Color c) :
 	xPos(x),
 	yPos(y),
 	height(h),
 	width(w),
 	lives(1),
+	type(type),
 	indestructible(false),
 	color(c) {}
 
@@ -43,12 +44,12 @@ void Brick::setIndestructible(bool ind) {
 	indestructible = ind;
 }
 
-bool Brick::hit() {
+int Brick::hit() {
 	if (indestructible) {
-		return false;
+		return 0;
 	}
 	if (lives <= 1) {
-		return true;
+		return type;
 	}
 	else {
 		lives--;
@@ -61,7 +62,7 @@ bool Brick::hit() {
 			break;
 		}
 	}
-	return false;
+	return 0;
 }
 
 void Brick::printState(int i) {

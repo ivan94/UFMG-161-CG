@@ -8,6 +8,7 @@ Paddle::Paddle(int x, int y, int w, int h, int minX, int maxX, Color c) :
 	xSpeed(0),
 	height(h),
 	width(w),
+	originalWidth(w),
 	minXLimit(minX),
 	maxXLimit(maxX),
 	maxSpeed(21),
@@ -53,6 +54,11 @@ void Paddle::printState() {
 	printf("Paddle:\nX Pos: %d\nY Pos: %d\nSpeed: %d\n\n", xPos, yPos, xSpeed);
 }
 
+void Paddle::changeSize(int newWidth, int frameCount) {
+	sizeFrameCount = frameCount;
+	width = newWidth;
+}
+
 void Paddle::update() {
 	this->xPos += xSpeed;
 	if (xPos < minXLimit) {
@@ -60,6 +66,12 @@ void Paddle::update() {
 	}
 	else if (xPos + width > maxXLimit) {
 		this->xPos = maxXLimit - width;
+	}
+	if (sizeFrameCount > 0) {
+		sizeFrameCount--;
+		if (sizeFrameCount == 0) {
+			width = originalWidth;
+		}
 	}
 }
 

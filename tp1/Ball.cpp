@@ -67,6 +67,10 @@ void Ball::setMaxSpeed(float speed) {
 	this->maxSpeed = speed;
 }
 
+float Ball::getMaxSpeed() {
+	return maxSpeed;
+}
+
 float Ball::getSpeed() {
 	return speed;
 }

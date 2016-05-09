@@ -3,10 +3,12 @@
 
 class Paddle {
 private:
+	const int originalWidth;
 	int xPos, yPos, xSpeed;
 	int height, width;
 	int minXLimit, maxXLimit;
 	int maxSpeed;
+	int sizeFrameCount;
 	Color color;
 
 public:
@@ -20,6 +22,7 @@ public:
 	int getMaxSpeed();
 	int getHeight();
 	int getWidth();
+	void changeSize(int newWidth, int frameCounts);
 	void printState();
 	void update();
 	void draw();

@@ -21,6 +21,7 @@ public:
 	void setSpeed(float speed);
 	void setMinSpeed(float speed);
 	void setMaxSpeed(float speed);
+	float getMaxSpeed();
 	float getSpeed();
 	int getXSpeed();
 	int getYSpeed();

@@ -62,17 +62,29 @@ void initBrickWall() {
 		brickY = gapY + i * (gapY + brickHeight);
 		for (j = 0; j < 15; j++) {
 			brickX = gapX + j * (gapX + brickWidth);
-			bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, Color(0.5f, 1.0f, 1.0f)));
-			numBricks++;
 			randNum = rand() % 100;
 			if (randNum < 30) {
+				bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, 1, Color(0.5f, 1.0f, 1.0f)));
 				(*(bricks.end() - 1)).setLives(2);
 				(*(bricks.end() - 1)).setColor(Color(.0f, .5f, 1.0f));
 			}
 			else if (randNum < 50) {
+				bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, 1, Color(0.5f, 1.0f, 1.0f)));
 				(*(bricks.end() - 1)).setLives(3);
 				(*(bricks.end() - 1)).setColor(Color::blue());
 			}
+			else if (randNum < 60) {
+				//Type 2 = bigger paddle
+				bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, 2, Color(0.655f, 0.063f, 0.761f)));
+			}
+			else if (randNum < 70) {
+				//Type 3 = smaller paddle
+				bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, 3, Color(1.0f, 1.0f, 0.0f)));
+			}
+			else {
+				bricks.push_back(Brick(brickX, brickY, brickWidth, brickHeight, 1, Color(0.5f, 1.0f, 1.0f)));
+			}
+			numBricks++;
 		}
 	}
 
@@ -95,7 +107,7 @@ void initBrickWall() {
 
 }
 
-void restartGame(bool restartScore, bool restartBricks) {
+void restartGame(bool restartScore, bool restartBricks, bool restartBallSpeed) {
 	GLOBAL_GAMEPAUSED = true;
 	if (restartBricks) {
 		initBrickWall();
@@ -104,8 +116,10 @@ void restartGame(bool restartScore, bool restartBricks) {
 	paddle.setXPos(377);
 	ball.setXPos(422);
 	ball.setYPos(450);
-	ball.setMinSpeed(2.85f);
-	ball.setMaxSpeed(7.25f);
+	if (restartBallSpeed) {
+		ball.setMinSpeed(2.85f);
+		ball.setMaxSpeed(7.25f);
+	}
 	ball.setSpeed(0.5f);
 	bgm.stop();
 	bgm.setVolume(20);
@@ -182,7 +196,7 @@ void character_callback(GLFWwindow *window, unsigned int codepoint) {
 		break;
 	case 'r':
 	case 'R':
-		restartGame(true, true);
+		restartGame(true, true, true);
 		break;
 	}
 }
@@ -223,6 +237,7 @@ void clearScreen() {
 int main(int argc, const char* argv[]) {
 	double timeElapsed;
 	int fpsCounter = 0;
+	int brickType;
 	GLFWwindow* window;
 
 	/*INIT SOUNDS*/
@@ -251,7 +266,7 @@ int main(int argc, const char* argv[]) {
 
 	srand(time(NULL));
 
-	restartGame(true, true);
+	restartGame(true, true, true);
 	gameTime = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window) && !GLOBAL_FINISHGAME) {
@@ -266,7 +281,7 @@ int main(int argc, const char* argv[]) {
 				lives.setValue(lvs);
 				GLOBAL_GAMEPAUSED = true;
 				if (lvs > 0) {
-					restartGame(false, false);
+					restartGame(false, false, false);
 				}
 			}
 			if (ball.collisionDetection(paddle)) {
@@ -275,13 +290,24 @@ int main(int argc, const char* argv[]) {
 			}
 			for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
 				if (ball.collisionDetection(*it)) {
-					if ((*it).hit()) {
+					brickType = (*it).hit();
+					if (brickType != 0) {
 						pts++;
 						score.setValue(pts);
 						it = bricks.erase(it);
 						numBricks--;
 						if (numBricks <= 0) {
-							restartGame(false, true);
+							ball.setMaxSpeed(ball.getMaxSpeed() + 1.4241);
+							restartGame(false, true, false);
+						}
+						//Apply bonuses
+						switch (brickType) {
+						case 2:
+							paddle.changeSize(200, 900);
+							break;
+						case 3:
+							paddle.changeSize(50, 900);
+							break;
 						}
 						//hitSound.play();
 					}
