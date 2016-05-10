@@ -5,7 +5,7 @@
 #include <ctime>
 #include <GLFW/glfw3.h>
 #include <GL/glut.h>
-//#include <SFML/Audio.hpp>
+#include <SFML/Audio.hpp>
 #include "Brick.h"
 #include "Color.h"
 #include "Paddle.h"
@@ -31,9 +31,8 @@ Ball ball(422, 450, 10, SCREENWIDTH, SCREENHEIGHT, Color::white());
 SpeedBar speedbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
 PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
 
-//sf::Music bgm;
-//sf::Sound hitSound;
-//sf::Sound kickSound;
+sf::Sound hitSound;
+sf::Sound kickSound;
 
 double gameTime;
 int windowWidth = SCREENWIDTH;
@@ -122,8 +121,6 @@ void restartGame(bool restartScore, bool restartBricks, bool restartBallSpeed) {
 		ball.setMaxSpeed(7.25f);
 	}
 	ball.setSpeed(0.5f);
-	//bgm.stop();
-	//bgm.setVolume(20);
 	if (restartScore) {
 		pts = 0;
 		lvs = 3;
@@ -152,11 +149,6 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) 
 			if (lvs > 0) {
 				GLOBAL_GAMEPAUSED = !GLOBAL_GAMEPAUSED;
 			}
-			/*if(GLOBAL_GAMEPAUSED){
-				bgm.pause();
-			}else{
-				bgm.play();
-			}*/
 		}
 		break;
 	case GLFW_MOUSE_BUTTON_RIGHT:
@@ -242,10 +234,6 @@ int main(int argc, const char* argv[]) {
 	GLFWwindow* window;
 
 	/*INIT SOUNDS*/
-	/*if(!bgm.openFromFile("media/htt.ogg")){
-		return false;
-	}
-
 	sf::SoundBuffer bufferHit, bufferKick;
 
 	if(!bufferHit.loadFromFile("media/snare.ogg")){
@@ -257,7 +245,7 @@ int main(int argc, const char* argv[]) {
 	}
 
 	kickSound.setBuffer(bufferKick);
-	hitSound.setBuffer(bufferHit);*/
+	hitSound.setBuffer(bufferHit);
 
 	glutInit(&argc, (char **)argv);
 
@@ -287,11 +275,12 @@ int main(int argc, const char* argv[]) {
 			}
 			if (ball.collisionDetection(paddle)) {
 				ball.setSpeed(1.0f - ((float)powerbar.getYPos() / (float)SCREENHEIGHT));
-				//kickSound.play();
+				kickSound.play();
 			}
 			for (std::vector<Brick>::iterator it = bricks.begin(); it != bricks.end(); it++) {
 				if (ball.collisionDetection(*it)) {
 					brickType = (*it).hit();
+					hitSound.play();
 					if (brickType != 0) {
 						pts++;
 						score.setValue(pts);
@@ -310,7 +299,6 @@ int main(int argc, const char* argv[]) {
 							paddle.changeSize(50, 900);
 							break;
 						}
-						//hitSound.play();
 					}
 					break;
 				}

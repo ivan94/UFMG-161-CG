@@ -1,0 +1,19 @@
+As seguintes bibliotecas, bem como suas respectivas dependencias devem ser instaladas para a correta compilação do projeto:
+opengl
+glfw3
+glut
+SFML
+
+As bibliotecas usadas possuem outras dependencias externas e seus repectivos headers que devem estar disponiveis na maquina, incluindo:
+X11
+xxf86vm
+Xrand
+pthread
+Xi
+Xcursor
+
+O arquivo de compilação assume que os headers e as shared libraries necessárias estão disponiveis nos caminhos padrões (/usr/local/include /usr/local/lib)
+
+Instruções de compilação:
+O projeto acompanha um arquivo makefile que faz as compilações individuais dos arquivos e o linking das bibliotecas.
+Basta então chamar a ferramenta make no diretório raiz do projeto para compilar os fontes. Um executavel de nome tp1 será gerado
