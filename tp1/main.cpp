@@ -5,7 +5,7 @@
 #include <ctime>
 #include <GLFW/glfw3.h>
 #include <GL/glut.h>
-#include <SFML/Audio.hpp>
+//#include <SFML/Audio.hpp>
 #include "Brick.h"
 #include "Color.h"
 #include "Paddle.h"
@@ -31,9 +31,9 @@ Ball ball(422, 450, 10, SCREENWIDTH, SCREENHEIGHT, Color::white());
 SpeedBar speedbar(470, 10, SCREENWIDTH, Color(1.0f, 1.0f, 0.0f));
 PowerBar powerbar(844, 10, SCREENHEIGHT, Color::red());
 
-sf::Music bgm;
-sf::Sound hitSound;
-sf::Sound kickSound;
+//sf::Music bgm;
+//sf::Sound hitSound;
+//sf::Sound kickSound;
 
 double gameTime;
 int windowWidth = SCREENWIDTH;
@@ -114,6 +114,7 @@ void restartGame(bool restartScore, bool restartBricks, bool restartBallSpeed) {
 	}
 	paddle.setSpeed(0);
 	paddle.setXPos(377);
+	paddle.changeSize(100, 0);
 	ball.setXPos(422);
 	ball.setYPos(450);
 	if (restartBallSpeed) {
@@ -121,8 +122,8 @@ void restartGame(bool restartScore, bool restartBricks, bool restartBallSpeed) {
 		ball.setMaxSpeed(7.25f);
 	}
 	ball.setSpeed(0.5f);
-	bgm.stop();
-	bgm.setVolume(20);
+	//bgm.stop();
+	//bgm.setVolume(20);
 	if (restartScore) {
 		pts = 0;
 		lvs = 3;
@@ -151,11 +152,11 @@ void mousebutton_callback(GLFWwindow* window, int button, int action, int mods) 
 			if (lvs > 0) {
 				GLOBAL_GAMEPAUSED = !GLOBAL_GAMEPAUSED;
 			}
-			if(GLOBAL_GAMEPAUSED){
+			/*if(GLOBAL_GAMEPAUSED){
 				bgm.pause();
 			}else{
 				bgm.play();
-			}
+			}*/
 		}
 		break;
 	case GLFW_MOUSE_BUTTON_RIGHT:
