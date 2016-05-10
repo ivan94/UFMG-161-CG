@@ -16,4 +16,25 @@ O arquivo de compilação assume que os headers e as shared libraries necessári
 
 Instruções de compilação:
 O projeto acompanha um arquivo makefile que faz as compilações individuais dos arquivos e o linking das bibliotecas.
-Basta então chamar a ferramenta make no diretório raiz do projeto para compilar os fontes. Um executavel de nome tp1 será gerado
+Basta então chamar a ferramenta make no diretório raiz do projeto para compilar os fontes. Um executavel de nome tp1 será gerado.
+
+Além da implementação básica do jogo junto às funcionalidades obrigatórias, adicionamos as seguintes funções:
+	
+	Barra inferior para indicar ao jogador a velocidade do paddle, dependendo da posição do mouse na tela;
+	
+	O deslocamento vertical do mouse muda a velocidade da bola ao acertar o paddle;
+	
+	Barra lateral para indicar a velocidade que a bola terá após acertar o paddle;
+	
+	Alguns dos tijolos são indestrutíveis (os tijolos cinza). Para ganhar o jogo basta destruir os outros tijolos;
+	
+	A cada vez que o jogador consegue destruir todos os tijolos destrutíveis o jogo começa novamente, mas a velocidade máxima que a bola pode alcançar aumenta, aumentando o nível de dificuldade;
+
+	Os tijogos possuem propríedades distintas:
+	Os cinza são indestrutíveis;
+	Os azuis podem possuir diversas vidas (a bola deve bater nele mais de uma vez para quebrá-lo). O azul mais escuro possui 3 vidas, o mediano possui 2 vidas e o mais claro possui apenas 1 vida;
+	Os roxos aumentam o tamanho do paddle por aproximadamente 15 segundos;
+	Os amarelos diminuem o tamanho do paddle por aproximadamente 15 segundos.
+
+O jogo é infinito, a ideia é conseguir a maior quantidade de pontos antes de perder as 3 vidas.
+No início do jogo e sempre que ele é reiniciado, os tijolos são gerados aleatoriamente, com exceção dos indestrutíveis, que são gerados sempre nas mesmas posições.
